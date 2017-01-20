@@ -1,0 +1,47 @@
+app1_*.sh
+
+app1/*.rbc
+app1/capybara-*.html
+app1/.rspec
+app1/log
+app1/tmp
+app1/db/*.sqlite3
+app1/db/*.sqlite3-journal
+app1/public/system
+app1/coverage/
+app1/spec/tmp
+**.orig
+rerun.txt
+pickle-email-*.html
+
+# TODO Comment out this rule if you are OK with secrets being uploaded to the repo
+app1/config/initializers/secret_token.rb
+
+# Only include if you have production secrets in this file, which is no longer a Rails default
+# config/secrets.yml
+
+# dotenv
+# TODO Comment out this rule if environment variables can be committed
+.env
+
+## Environment normalization:
+app1/.bundle
+app1/vendor/bundle
+
+# these should all be checked in to normalize the environment:
+# Gemfile.lock, .ruby-version, .ruby-gemset
+
+# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
+app1/.rvmrc
+
+# if using bower-rails ignore default bower_components path bower.json files
+/vendor/assets/bower_components
+*.bowerrc
+bower.json
+
+# Ignore pow environment settings
+app1/.powenv
+
+# Ignore Byebug command history file.
+app1/.byebug_history
+
