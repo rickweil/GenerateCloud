@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  business: one
+  serial_number: 1
+  software_version: MyString
+  mac_address: MyString
+  latitude: 1.5
+  longitude: 1.5
+  license_key: MyString
+  license_expiration_date: 2017-01-18
+  license_remaining_uses: 1
+
+two:
+  business: two
+  serial_number: 1
+  software_version: MyString
+  mac_address: MyString
+  latitude: 1.5
+  longitude: 1.5
+  license_key: MyString
+  license_expiration_date: 2017-01-18
+  license_remaining_uses: 1

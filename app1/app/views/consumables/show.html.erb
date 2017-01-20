@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Udi:</strong>
+  <%= @consumable.udi %>
+</p>
+
+<p>
+  <strong>Expiration date:</strong>
+  <%= @consumable.expiration_date %>
+</p>
+
+<%= link_to 'Edit', edit_consumable_path(@consumable) %> |
+<%= link_to 'Back', consumables_path %>

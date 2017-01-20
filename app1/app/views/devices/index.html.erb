@@ -1,0 +1,43 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Devices</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Business</th>
+      <th>Serial number</th>
+      <th>Software version</th>
+      <th>Mac address</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>License key</th>
+      <th>License expiration date</th>
+      <th>License remaining uses</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @devices.each do |device| %>
+      <tr>
+        <td><%= link_to device.business.name, "/businesses/#{device.business_id}"  %></td>
+        <td><%= device.serial_number %></td>
+        <td><%= device.software_version %></td>
+        <td><%= device.mac_address %></td>
+        <td><%= device.latitude %></td>
+        <td><%= device.longitude %></td>
+        <td><%= device.license_key %></td>
+        <td><%= device.license_expiration_date %></td>
+        <td><%= device.license_remaining_uses %></td>
+        <td><%= link_to 'Show', device %></td>
+        <td><%= link_to 'Edit', edit_device_path(device) %></td>
+        <td><%= link_to 'Destroy', device, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Device', new_device_path %>

@@ -1,0 +1,62 @@
+<%= form_for(device) do |f| %>
+  <% if device.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(device.errors.count, "error") %> prohibited this device from being saved:</h2>
+
+      <ul>
+      <% device.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :business_id %>
+    <%= f.text_field :business_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :serial_number %>
+    <%= f.number_field :serial_number %>
+  </div>
+
+  <div class="field">
+    <%= f.label :software_version %>
+    <%= f.text_field :software_version %>
+  </div>
+
+  <div class="field">
+    <%= f.label :mac_address %>
+    <%= f.text_field :mac_address %>
+  </div>
+
+  <div class="field">
+    <%= f.label :latitude %>
+    <%= f.text_field :latitude %>
+  </div>
+
+  <div class="field">
+    <%= f.label :longitude %>
+    <%= f.text_field :longitude %>
+  </div>
+
+  <div class="field">
+    <%= f.label :license_key %>
+    <%= f.text_field :license_key %>
+  </div>
+
+  <div class="field">
+    <%= f.label :license_expiration_date %>
+    <%= f.date_select :license_expiration_date %>
+  </div>
+
+  <div class="field">
+    <%= f.label :license_remaining_uses %>
+    <%= f.number_field :license_remaining_uses %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

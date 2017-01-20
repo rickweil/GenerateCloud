@@ -1,0 +1,60 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Results</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Patient</th>
+      <th>Business</th>
+      <th>Device</th>
+      <th>Consumable</th>
+      <th>Value</th>
+      <th>Result datetime</th>
+      <th>Notes</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @results.each do |result| %>
+      <tr>
+        <td><%= result.user.email  %></td>
+        <td><%= link_to result.patient_id, "/patients/#{result.patient_id}"  %></td>
+        <td><%= link_to result.business_id, "/businesses/#{result.business_id}"  %></td>
+        <td><%= link_to result.device_id, "/devices/#{result.device_id}"  %></td>
+        <td><%= link_to result.consumable_id, "/consumables/#{result.consumable_id}"  %></td>
+        <td><%= result.value %></td>
+        <td><%= result.result_datetime %></td>
+        <td><%= result.notes %></td>
+        <td><%= link_to 'Show', result %></td>
+        <td><%= link_to 'Edit', edit_result_path(result) %></td>
+        <td><%= link_to 'Destroy', result, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Result', new_result_path %>
+<script>
+
+    last_update = "<%= @results.first.updated_at %>";
+    (function pollServerForNewResults() {
+          $.ajax({
+              url: '/results/last_update.json',
+              data: {'last_update' : last_update},
+              success: function(response) {
+                 if(response.refresh)
+                   location.reload();
+                  setTimeout(pollServerForNewResults, 1000);
+              },
+              failure: function(response) {
+                  t=response.last_update;
+              }
+          });
+    }());
+
+</script>

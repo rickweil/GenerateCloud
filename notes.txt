@@ -1,0 +1,39 @@
+1. Add to businesses/index.html.erb
+
+  <% @businesses.each do |business| %>
+      <tr>
+        <td><%= business.name %></td>
+        <td><%= business.address %></td>
+        <td><%= link_to business.email, "mailto:#{business.email}" %></td>
+        <td><%= link_to business.phone, "tel:#{business.phone}" %></td>
+        <td><%= image_tag(business.logo_url, height: 80) %></td>
+        <td><%= link_to business.status.status, "/statuses/#{business.status}"  %></td>
+        <td><%= business.notes %></td>
+        <td><%= link_to 'Show', business %></td>
+        <td><%= link_to 'Edit', edit_business_path(business) %></td>
+        <td><%= link_to 'Destroy', business, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+  <% end %>
+
+
+
+
+2.  continuous reload of current page...add   to view.html.erb
+
+<script>
+  window.setInterval(function(){
+     location.reload();
+  }, 5000);
+</script>
+
+3. order results reverse chronologically   to view.html.erb
+    @results = @results.order('updated_at DESC').where get_query_hash
+
+
+
+
+
+
+
+
+

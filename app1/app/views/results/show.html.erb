@@ -1,0 +1,63 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @result.user && (@result.user.first_name + " " + @result.user.last_name) %>
+</p>
+
+<p>
+  <strong>Patient:</strong>
+  <%= @result.patient && (@result.patient.first_name + " " + @result.patient.last_name) %>
+</p>
+
+<p>
+  <strong>Business:</strong>
+  <%= @result.business && @result.business.name %>
+</p>
+
+<p>
+  <strong>Device:</strong>
+  <%= @result.device && @result.device.serial_number %>
+</p>
+
+<p>
+  <strong>Consumable:</strong>
+  <%= @result.consumable && "#{@result.consumable.udi} (exp #{@result.consumable.expiration_date})"%>
+</p>
+
+<p>
+  <strong>Value:</strong>
+  <%= @result.value %>
+</p>
+
+<p>
+  <strong>Result datetime:</strong>
+  <%= @result.result_datetime %>
+</p>
+
+<p>
+  <strong>Notes:</strong>
+  <%= @result.notes %>
+</p>
+
+<%= link_to 'Edit', edit_result_path(@result) %> |
+<%= link_to 'Back', results_path %>
+<script>
+
+    last_update = "<%= @result.updated_at %>";
+    (function pollServerForNewResults() {
+        $.ajax({
+            url: '/results/last_update.json',
+            data: {'last_update' : last_update},
+            success: function(response) {
+                if(response.refresh)
+                    window.location = '/results/' + response.newest_id;
+                setTimeout(pollServerForNewResults, 1000);
+            },
+            failure: function(response) {
+                t=response.last_update;
+            }
+        });
+    }());
+
+</script>

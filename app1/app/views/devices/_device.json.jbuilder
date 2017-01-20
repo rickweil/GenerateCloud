@@ -1,0 +1,2 @@
+json.extract! device, :id, :business_id, :serial_number, :software_version, :mac_address, :latitude, :longitude, :license_key, :license_expiration_date, :license_remaining_uses, :created_at, :updated_at
+json.url device_url(device, format: :json)
