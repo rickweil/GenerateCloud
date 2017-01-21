@@ -52,7 +52,7 @@
             success: function(response) {
                 if(response.refresh)
                     window.location = '/results/' + response.newest_id;
-                setTimeout(pollServerForNewResults, 1000);
+                setTimeout(pollServerForNewResults, 2000+Math.random());
             },
             failure: function(response) {
                 t=response.last_update;
