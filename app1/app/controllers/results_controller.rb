@@ -3,10 +3,7 @@ class ResultsController < ApplicationController
 
   # GET /results
   # GET /results.json
-  load_and_authorize_resource :except => [:last_update]
-
-  @@newest_updated_at ||= Result.first.updated_at.to_i
-  @@newest_id ||= Result.first.id
+  load_and_authorize_resource
 
   def index
     # @results = Result.where get_query_hash
@@ -16,10 +13,13 @@ class ResultsController < ApplicationController
   def last_update
     client_updated_at = params[:last_update]
     t_client = DateTime.strptime(client_updated_at, "%Y-%m-%d %H:%M:%S").to_i
-    refresh = t_client < @@newest_updated_at
+
+    @newest = @results.order('updated_at').last
+
+    refresh = t_client < @newest.updated_at.to_i
     #@result.newer_than params[:last_update]
     respond_to do |format|
-        format.json { render json: { :refresh => refresh, :newest_id => @@newest_id} }
+        format.json { render json: { :refresh => refresh, :newest_id => @newest.id} }
       end
   end
 
@@ -44,8 +44,6 @@ class ResultsController < ApplicationController
 
     respond_to do |format|
       if @result.save
-        @@newest_updated_at = @result.updated_at.to_i     ### update when there is an updated Result
-        @@newest_id = @result.id
         format.html { redirect_to @result, notice: 'Result was successfully created.' }
         format.json { render :show, status: :created, location: @result }
       else
@@ -60,8 +58,6 @@ class ResultsController < ApplicationController
   def update
     respond_to do |format|
       if @result.update(result_params)
-        @@newest_updated_at = @result.updated_at.to_i     ### update when there is an updated Result
-        @@newest_id = @result.id
         format.html { redirect_to @result, notice: 'Result was successfully updated.' }
         format.json { render :show, status: :ok, location: @result }
       else
