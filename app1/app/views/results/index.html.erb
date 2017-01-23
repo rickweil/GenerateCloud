@@ -49,7 +49,7 @@
               success: function(response) {
                  if(response.refresh)
                    location.reload();
-                  setTimeout(pollServerForNewResults, 2000+Math.random());
+                  setTimeout(pollServerForNewResults, 1000);
               },
               failure: function(response) {
                   t=response.last_update;
