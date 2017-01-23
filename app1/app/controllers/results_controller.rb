@@ -8,24 +8,26 @@ class ResultsController < ApplicationController
   def index
     # @results = Result.where get_query_hash
     @results = @results.order('updated_at DESC').where get_query_hash
+    session[:newest_browser_timestamp] = @results.first.updated_at.to_i
+    @update = session[:update] = params[:update].nil? ? 'false' : params[:update]
+    # flash[:notice] = "new results" if session[:update]    # flash a toast message on update
   end
 
   def last_update
-    client_updated_at = params[:last_update]
-    t_client = DateTime.strptime(client_updated_at, "%Y-%m-%d %H:%M:%S").to_i
-
     @newest = @results.order('updated_at').last
-
-    refresh = t_client < @newest.updated_at.to_i
-    #@result.newer_than params[:last_update]
+    @newest_server_timestamp = @newest.updated_at.to_i
+    refresh = @newest_server_timestamp != session[:newest_browser_timestamp]
     respond_to do |format|
-        format.json { render json: { :refresh => refresh, :newest_id => @newest.id} }
+        format.json { render json: { :refresh => refresh, :newest => @newest.id, :update => session[:update]} }
       end
   end
 
   # GET /results/1
   # GET /results/1.json
   def show
+    session[:newest_browser_timestamp] = @result.updated_at.to_i
+    @update = session[:update] = params[:update]
+    # flash[:notice] = "new results" if session[:update]    # flash a toast message on update
   end
 
   # GET /results/new

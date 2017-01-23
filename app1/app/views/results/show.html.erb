@@ -1,5 +1,8 @@
+<h1>  <%= (@update =='true') ? "Newest Result" : "Result" %> </h1>
+
 <p id="notice"><%= notice %></p>
 
+<div class = "hilite">
 <p>
   <strong>User:</strong>
   <%= @result.user && (@result.user.first_name + " " + @result.user.last_name) %>
@@ -39,19 +42,24 @@
   <strong>Notes:</strong>
   <%= @result.notes %>
 </p>
-
+</div>
 <%= link_to 'Edit', edit_result_path(@result) %> |
 <%= link_to 'Back', results_path %>
 <script>
 
-    last_update = "<%= @result.updated_at %>";
+<% if @update =='true' %>
+    $(".hilite").css("background-color", "#ffffcc");
+    setTimeout(function() {
+        $(".hilite").css("background-color", "white").effect("highlight", {}, 2000);
+    }, 2000);
+
     (function pollServerForNewResults() {
         $.ajax({
             url: '/results/last_update.json',
-            data: {'last_update' : last_update},
+            //data: {'last_update' : last_update},
             success: function(response) {
-                if(response.refresh)
-                    window.location = '/results/' + response.newest_id;
+                if( response.update &&  response.refresh)
+                    window.location = '/results/' + response.newest + "?update=true";
                 setTimeout(pollServerForNewResults, 2000+Math.random());
             },
             failure: function(response) {
@@ -59,5 +67,5 @@
             }
         });
     }());
-
+<% end %>
 </script>
