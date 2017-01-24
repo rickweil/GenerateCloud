@@ -154,7 +154,12 @@ def post_process_script options
   file2.puts "class Ability"
   file2.puts "# https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities"
   file2.puts "  include CanCan::Ability\n"
-  file2.puts "  def initialize(user)"
+  file2.puts "  def initialize(user)\n"
+  file2.puts "  ############# @todo NO_AUTHORZATION"
+  file2.puts "  if !$AUTHENTICATOR"
+  file2.puts "    can [:manage], [:all]"
+  file2.puts "    return"
+  file2.puts "  end\n"
 
   attr = attr.map { |str| str.to_s} if !attr.nil?
   (2..spreadsheet.last_row).each do |i|
@@ -292,8 +297,8 @@ options = {
     database: 'development',
     username: 'blog_role',
     password: 'blog_role',
-    app_admin_name: 'rick.weil@sparton.com',
-    app_admin_password: '12341234',
+    #app_admin_name: 'rick.weil@sparton.com',
+    #app_admin_password: '12341234',
 
     # import stuff
     model:  'all',            # work with all data models in the spreadsheet
@@ -338,6 +343,8 @@ OptionParser.new do |opts|
   end
 end.parse!
 options[:file] = ARGV.pop if options[:file].nil?
+
+
 options[:app_name] = File.basename(options[:file], '.xlsx').downcase
 options[:database] = "#{options[:app_name]}_#{options[:database]}"
 

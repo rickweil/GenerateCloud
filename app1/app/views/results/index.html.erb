@@ -1,5 +1,5 @@
 <p id="notice"><%= notice %></p>
-<h1>  <%= (session[:update] =='true') ? "Newest Results" : "Results" %> </h1>
+<h1>  <%= (session[:update] =='true') ? "Newest Results" : "Results" %><span id="hb"></span> </h1>
 
 <%= link_to 'New Result', new_result_path %> |
 <%= link_to 'Show Newest Result', result_path({:id => @results.first, :update => true} ) %> |
@@ -50,17 +50,23 @@
     }, 2000);
 
     // poll server to see if new results have been recorded.  Reload page if so.
+    var xhr;
     (function pollServerForNewResults() {
-        $.ajax({
+        if(xhr && xhr.readyState != 4){
+            xhr.abort();
+        }
+        xhr = $.ajax({
             url: '/results/last_update.json',
             success: function(response) {
-               if(response.refresh)
+               if(response.refresh) {
                    window.location = "/results?update=true";
-                 //location.reload();
-
+               }
+               hb = document.getElementById("hb");
+               hb.innerText = (hb.innerText.length == 0) ? "." : "";
                setTimeout(pollServerForNewResults, 2000+Math.random());
             }
         });
     }());
   <% end %>
+
 </script>

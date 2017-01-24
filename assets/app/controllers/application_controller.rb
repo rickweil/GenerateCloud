@@ -1,9 +1,15 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  before_action :authenticate_user!
-  before_action :configure_permitted_parameters, if: :devise_controller?
 
-  # set $models for application layout header to programatically set links to models
+  $AUTHENTICATOR = true
+
+  ########### @todo NO_AUTHENTICATION
+  if $AUTHENTICATOR
+    before_action :authenticate_user!
+    before_action :configure_permitted_parameters, if: :devise_controller?
+  end
+
+# set $models for application layout header to programatically set links to models
   Rails.application.eager_load!
   $models = ActiveRecord::Base.descendants
 

@@ -1,4 +1,4 @@
-<h1>  <%= (@update =='true') ? "Newest Result" : "Result" %> </h1>
+<h1>  <%= (@update =='true') ? "Newest Result" : "Result" %><span id="hb"></span> </h1>
 
 <p id="notice"><%= notice %></p>
 
@@ -53,13 +53,19 @@
         $(".hilite").css("background-color", "white").effect("highlight", {}, 2000);
     }, 2000);
 
+    var xhr;
     (function pollServerForNewResults() {
+        if(xhr && xhr.readyState != 4){
+            xhr.abort();
+        }
         $.ajax({
             url: '/results/last_update.json',
             //data: {'last_update' : last_update},
             success: function(response) {
                 if( response.update &&  response.refresh)
                     window.location = '/results/' + response.newest + "?update=true";
+                hb = document.getElementById("hb");
+                hb.innerText = (hb.innerText.length == 0) ? "." : "";
                 setTimeout(pollServerForNewResults, 2000+Math.random());
             },
             failure: function(response) {

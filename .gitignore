@@ -1,5 +1,9 @@
-app1_*.sh
+*.tar.gz
 
+app2/*
+app2_*.sh
+
+app1_*.sh
 app1/*.rbc
 app1/capybara-*.html
 app1/.rspec
@@ -10,6 +14,7 @@ app1/db/*.sqlite3-journal
 app1/public/system
 app1/coverage/
 app1/spec/tmp
+
 **.orig
 rerun.txt
 pickle-email-*.html

@@ -1,12 +1,13 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  before_action :authenticate_user!
-  before_action :configure_permitted_parameters, if: :devise_controller?
 
-  # use cancan to authorize resources
-  # you will want to configure ability.rb model for your specific business rules
-  # and probably want to move the following to each controller (with configurations)
-  # load_and_authorize_resource
+  $AUTHENTICATOR = false
+
+  ########### @todo NO_AUTHENTICATION
+  if $AUTHENTICATOR
+    before_action :authenticate_user!
+    before_action :configure_permitted_parameters, if: :devise_controller?
+  end
 
   # set $models for application layout header to programatically set links to models
   Rails.application.eager_load!
@@ -28,6 +29,7 @@ class ApplicationController < ActionController::Base
 
   protected
 
+  # need to add User parameters allowed to be set during sign up.
   def configure_permitted_parameters
     #devise_parameter_sanitizer.permit(:sign_up, keys: [:business_id, :super_admin_role,...])
   end
