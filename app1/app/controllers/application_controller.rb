@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
-  $AUTHENTICATOR = false
+  $AUTHENTICATOR = true
 
   ########### @todo NO_AUTHENTICATION
   if $AUTHENTICATOR

@@ -23,11 +23,11 @@
   <tbody>
     <% @results.each do |result| %>
       <tr>
-        <td><%= result.user.email  %></td>
-        <td><%= link_to result.patient_id, "/patients/#{result.patient_id}"  %></td>
-        <td><%= link_to result.business_id, "/businesses/#{result.business_id}"  %></td>
-        <td><%= link_to result.device_id, "/devices/#{result.device_id}"  %></td>
-        <td><%= link_to result.consumable_id, "/consumables/#{result.consumable_id}"  %></td>
+        <td><%= result.user.full_name  %></td>
+        <td><%= link_to result.patient.full_name, "/patients/#{result.patient_id}"  %></td>
+        <td><%= link_to result.business.name, "/businesses/#{result.business_id}"  %></td>
+        <td><%= link_to result.device.serial_number, "/devices/#{result.device_id}"  %></td>
+        <td><%= link_to result.consumable.udi, "/consumables/#{result.consumable_id}"  %></td>
         <td><%= result.value %></td>
         <td><%= result.result_datetime %></td>
         <td><%= result.notes %></td>

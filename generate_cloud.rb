@@ -81,10 +81,9 @@ def create_app_script options
 # configure the database
   file.puts "echo configure the database"
   file.puts "sed -i 's/  adapter:/  #TODO!!! YOU NEED TO CONFIGURE THIS for EACH environment for (development, test, production) \\\n  adapter:/' config/database.yml"
-  file.puts "sed -i 's/  adapter:/  username: #{options[:username]} \\\n  adapter:/' config/database.yml"
-  file.puts "sed -i 's/  adapter:/  password: #{options[:password]} \\\n  adapter:/' config/database.yml"
+  file.puts "sed -i 's/  adapter:/  username: #{options[:database_username]} \\\n  adapter:/' config/database.yml"
+  file.puts "sed -i 's/  adapter:/  password: #{options[:database_password]} \\\n  adapter:/' config/database.yml"
   file.puts "sed -i 's/  adapter:/  host: \"localhost\" \\\n\\\n  adapter:/' config/database.yml"
-  #file.write "sed -i 's/#host: localhost/host: \"localhost\"/' config/database.yml"
   file.puts 'rake db:drop'
   file.puts 'rake db:create'
   # file.write "sudo dropdb #{app_name}_development"
@@ -93,7 +92,7 @@ def create_app_script options
 # now install devise
   file.puts "spring stop"    # ensure the spring server is stopped before running generator
   file.puts "rails g devise:install"
-  file.puts "sed -i 's/config.action_mailer.raise_delivery_errors = false/config.action_mailer.raise_delivery_errors = true\\nconfig.action_mailer.default_url_options = { host: \"localhost\", port:3000 }\\n/' config/environments/development.rb"
+  file.puts "sed -i 's/config.action_mailer.raise_delivery_errors = false/config.action_mailer.raise_delivery_errors = true\\n  config.action_mailer.default_url_options = { host: \"localhost\", port:3000 }\\n/' config/environments/development.rb"
   file.puts "rails generate devise User"
   file.puts "rails generate devise:views"
 #
@@ -297,21 +296,19 @@ end
 # set up initial configuration parameters
 options = {
     # database configuration
-    adapter:  'postgresql', # or 'mysql' or 'sqlite3' or 'oracle_enhanced'
-    host:     'localhost',
-    database: 'development',
-    username: 'blog_role',
-    password: 'blog_role',
-    #app_admin_name: 'rick.weil@sparton.com',
-    #app_admin_password: '12341234',
+    # adapter:  'postgresql', # or 'mysql' or 'sqlite3' or 'oracle_enhanced'
+    # host:     'localhost',
+    # database: 'development',
+    # username: 'blog_role',
+    # password: 'blog_role',
 
-    # import stuff
-    model:  'all',            # work with all data models in the spreadsheet
-    file: nil,                # you have to specify this
-    import_data: true,        # import data for specified models
+    import_data: false,        # import data for specified models
     create_model: false,  # create and run migrations for specified models
     execute:  false,          # After creating a script, execute it.
 }
+
+options[:file] = ARGV.pop
+print options[:file]
 
 # parse command line optionsF
 OptionParser.new do |opts|
@@ -347,11 +344,23 @@ OptionParser.new do |opts|
     exit
   end
 end.parse!
-options[:file] = ARGV.pop if options[:file].nil?
-
 
 options[:app_name] = File.basename(options[:file], '.xlsx').downcase
 options[:database] = "#{options[:app_name]}_#{options[:database]}"
+
+begin
+  spreadsheet = Roo::Excelx.new(options[:file])
+  spreadsheet.default_sheet = 'config'
+  header = spreadsheet.row(1)
+  (2..spreadsheet.last_row).each do |i|
+    row = Hash[[header, spreadsheet.row(i)].transpose]
+    options[row['Key'].to_sym] = row['Value']
+  end
+rescue
+  raise "ya, you need spreadsheet with tab labeled 'config' Key and  Value columns and data for this to work\r\n"
+end
+options.each { |k,v| puts ":#{k} => '#{v}'" }
+
 
 print "OPTION:\t#{options}\r\n" if $verbose
 print "ARGV:\t#{ARGV}\r\n"      if $verbose
@@ -385,8 +394,8 @@ ActiveRecord::Base.establish_connection(
     adapter:  options[:adapter],
     host:     options[:host],
     database: options[:database],
-    username: options[:username],
-    password: options[:password]
+    username: options[:database_username],
+    password: options[:database_password]
 )
 
 if options[:create_model]
