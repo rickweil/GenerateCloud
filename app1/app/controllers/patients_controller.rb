@@ -70,6 +70,6 @@ class PatientsController < ApplicationController
 
     # Never trust parameters from the scary internet, only.where get_query_hashow the white list through.
     def patient_params
-      params.require(:patient).permit(:pid, :date_of_birth, :sex, :first_name, :last_name, :business_id, :email_address)
+      params.require(:patient).permit(:pid, :date_of_birth, :sex, :first_name, :last_name, :business_id, :email_address, :status_id)
     end
 end

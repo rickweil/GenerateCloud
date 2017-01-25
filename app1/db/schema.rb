@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170118160845) do
+ActiveRecord::Schema.define(version: 20170125212639) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,7 +61,9 @@ ActiveRecord::Schema.define(version: 20170118160845) do
     t.string   "email_address"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+    t.integer  "status_id"
     t.index ["business_id"], name: "index_patients_on_business_id", using: :btree
+    t.index ["status_id"], name: "index_patients_on_status_id", using: :btree
   end
 
   create_table "results", force: :cascade do |t|
@@ -120,6 +122,7 @@ ActiveRecord::Schema.define(version: 20170118160845) do
   add_foreign_key "businesses", "statuses"
   add_foreign_key "devices", "businesses"
   add_foreign_key "patients", "businesses"
+  add_foreign_key "patients", "statuses"
   add_foreign_key "results", "businesses"
   add_foreign_key "results", "consumables"
   add_foreign_key "results", "devices"
