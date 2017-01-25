@@ -1,4 +1,8 @@
+.idea/*
 *.tar.gz
+
+skills/*
+skills_*.sh
 
 app2/*
 app2_*.sh

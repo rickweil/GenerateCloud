@@ -146,56 +146,61 @@ def post_process_script options
   file.puts "rake db:migrate"
 
 # augment Abililties
-  spreadsheet = Roo::Excelx.new(config_file)
-  spreadsheet.default_sheet = 'ability'
-  header = spreadsheet.row(1)
+  begin
+    spreadsheet = Roo::Excelx.new(config_file)
+    spreadsheet.default_sheet = 'ability'
+    header = spreadsheet.row(1)
 
-  file2 = File.open("#{app_name}/app/models/ability.rb",'w')
-  file2.puts "class Ability"
-  file2.puts "# https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities"
-  file2.puts "  include CanCan::Ability\n"
-  file2.puts "  def initialize(user)\n"
-  file2.puts "  ############# @todo NO_AUTHORZATION"
-  file2.puts "  if !$AUTHENTICATOR"
-  file2.puts "    can [:manage], [:all]"
-  file2.puts "    return"
-  file2.puts "  end\n"
+    file2 = File.open("#{app_name}/app/models/ability.rb",'w')
+    file2.puts "class Ability"
+    file2.puts "# https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities"
+    file2.puts "  include CanCan::Ability\n"
+    file2.puts "  def initialize(user)\n\n"
+    file2.puts "  ############# @todo NO_AUTHORZATION"
+    file2.puts "    if !$AUTHENTICATOR"
+    file2.puts "      can [:manage], [:all]"
+    file2.puts "      return"
+    file2.puts "    end\n\n"
 
-  attr = attr.map { |str| str.to_s} if !attr.nil?
-  (2..spreadsheet.last_row).each do |i|
-    h = header.zip spreadsheet.row i
-    h = h.to_h
-    roles = h['Role'].split(',').map { |role| "user.#{role}? " }
-    abilities = h['Ability'].split(',').map { |ability| ability.strip.to_sym }
-    resources = h['Resource'].split(',').map { |resource| resource.strip }
-    conditions = []
-    conditions = h['Condition'].split(',').map { |condition| condition.strip } if h['Condition']
-    file2.puts "    if #{roles.join ' || '}"
+    attr = attr.map { |str| str.to_s} if !attr.nil?
+    (2..spreadsheet.last_row).each do |i|
+      h = header.zip spreadsheet.row i
+      h = h.to_h
+      roles = h['Role'].split(',').map { |role| "user.#{role}? " }
+      abilities = h['Ability'].split(',').map { |ability| ability.strip.to_sym }
+      resources = h['Resource'].split(',').map { |resource| resource.strip }
+      conditions = []
+      conditions = h['Condition'].split(',').map { |condition| condition.strip } if h['Condition']
+      file2.puts "    if #{roles.join ' || '}"
 
-    # create abilities
-    str = "      can #{abilities}, [#{resources.join ', '}]"
+      # create abilities
+      str = "      can #{abilities}, [#{resources.join ', '}]"
 
-    # add conditions if any
-    str += ', ' if conditions.length > 0
-    conditions.each_with_index { |condition, ii|
-      str += ', ' if ii > 0
-      if condition == 'user_id'
-        str += ":#{condition} => user.id"
-      elsif condition == "#{resources[0].underscore.downcase}_id"
-        str += ":id => user.#{condition}"
-      else
-        str += ":#{condition} => user.#{condition}"
-      end
-    }
-    file2.puts str
+      # add conditions if any
+      str += ', ' if conditions.length > 0
+      conditions.each_with_index { |condition, ii|
+        str += ', ' if ii > 0
+        if condition == 'user_id'
+          str += ":#{condition} => user.id"
+        elsif condition == "#{resources[0].underscore.downcase}_id"
+          str += ":id => user.#{condition}"
+        else
+          str += ":#{condition} => user.#{condition}"
+        end
+      }
+      file2.puts str
 
-    file2.puts "    end"
+      file2.puts "    end"
+    end
+    file2.puts "  end\nend\n"
+    file2.close
+    file.puts "cat #{app_name}/app/models/ability.rb"
+    file.close
+    File.chmod(0755, script_name)
+  rescue
+    puts "*********** ERROR CREATING ABILITY *************\n\n"
   end
-  file2.puts "  end\nend\n"
-  file2.close
-  file.puts "cat #{app_name}/app/models/ability.rb"
-  file.close
-  File.chmod(0755, script_name)
+
   script_name
 end
 
@@ -268,7 +273,7 @@ def create_model_script options
               s="sed -i 's/#{item}/#{item}.email /'   app/views/#{model.underscore.pluralize}/index.html.erb"
             elsif model[0] == model[0].upcase
               path = "\"\\\/#{k.underscore.pluralize}\\\/\#{#{model.underscore}.#{k}_id}\""
-              s="sed -i 's/#{item}/link_to #{item}_id, #{path} /'   app/views/#{model.underscore.pluralize}/index.html.erb"
+              s="sed -i 's/#{item} /link_to #{item}_id, #{path} /'   app/views/#{model.underscore.pluralize}/index.html.erb"
             end
             file.puts s
           end
