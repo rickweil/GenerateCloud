@@ -1,3 +1,5 @@
+app2/*
+foo/*
 app1_*.sh
 
 app1/*.rbc
@@ -7,6 +9,7 @@ app1/log
 app1/tmp
 app1/db/*.sqlite3
 app1/db/*.sqlite3-journal
+app1/db/migrate/*.rb
 app1/public/system
 app1/coverage/
 app1/spec/tmp
