@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  get 'results/last_update', to: "results#last_update"
   resources :results
   resources :patients
   resources :devices

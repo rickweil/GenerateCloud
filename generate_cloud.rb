@@ -3,6 +3,7 @@ require 'optparse'
 require 'roo'
 require 'active_record'
 
+$sed = 'gsed'   #macos
 $verbose = false
 #$allowable = [:inventory_type, :expiration_date, :specimen_id, :mfg_info, :consumable_id, :serial_number]
 $allowable = nil
@@ -80,11 +81,11 @@ def create_app_script options
 
 # configure the database
   file.puts "echo configure the database"
-  file.puts "sed -i 's/  adapter:/  #TODO!!! YOU NEED TO CONFIGURE THIS for EACH environment for (development, test, production) \\\n  adapter:/' config/database.yml"
-  file.puts "sed -i 's/  adapter:/  username: #{options[:username]} \\\n  adapter:/' config/database.yml"
-  file.puts "sed -i 's/  adapter:/  password: #{options[:password]} \\\n  adapter:/' config/database.yml"
-  file.puts "sed -i 's/  adapter:/  host: \"localhost\" \\\n\\\n  adapter:/' config/database.yml"
-  #file.write "sed -i 's/#host: localhost/host: \"localhost\"/' config/database.yml"
+  file.puts "#{$sed} -i 's/  adapter:/  #TODO!!! YOU NEED TO CONFIGURE THIS for EACH environment for (development, test, production) \\\n  adapter:/' config/database.yml"
+  file.puts "#{$sed} -i 's/  adapter:/  username: #{options[:username]} \\\n  adapter:/' config/database.yml"
+  file.puts "#{$sed} -i 's/  adapter:/  password: #{options[:password]} \\\n  adapter:/' config/database.yml"
+  file.puts "#{$sed} -i 's/  adapter:/  host: \"localhost\" \\\n\\\n  adapter:/' config/database.yml"
+  #file.write "#{$sed} -i 's/#host: localhost/host: \"localhost\"/' config/database.yml"
   file.puts 'rake db:drop'
   file.puts 'rake db:create'
   # file.write "sudo dropdb #{app_name}_development"
@@ -93,7 +94,7 @@ def create_app_script options
 # now install devise
   file.puts "spring stop"    # ensure the spring server is stopped before running generator
   file.puts "rails g devise:install"
-  file.puts "sed -i 's/config.action_mailer.raise_delivery_errors = false/config.action_mailer.raise_delivery_errors = true\\nconfig.action_mailer.default_url_options = { host: \"localhost\", port:3000 }\\n/' config/environments/development.rb"
+  file.puts "#{$sed} -i 's/config.action_mailer.raise_delivery_errors = false/config.action_mailer.raise_delivery_errors = true\\nconfig.action_mailer.default_url_options = { host: \"localhost\", port:3000 }\\n/' config/environments/development.rb"
   file.puts "rails generate devise User"
   file.puts "rails generate devise:views"
 #
@@ -121,7 +122,7 @@ def create_app_script options
 # create welcome page and route, and set root url to point there
   file.puts "\necho create welcome page and route, and set root url to point there"
   file.puts "rails generate controller Welcome index"
-  file.puts  "sed -i 's/get /root :to => \"welcome#index\"\\n  get /' config/routes.rb"
+  file.puts  "#{$sed} -i 's/get /root :to => \"welcome#index\"\\n  get /' config/routes.rb"
 
 # add web administration
   file.puts 'rails g rails_admin:install'
@@ -244,10 +245,10 @@ def create_model_script options
       begin
         cmd, types = foo.create_model options[:file]
         file.puts cmd
-        file.puts "sed -i 's/def index/load_and_authorize_resource\\n  def index/'   app/controllers/#{model.underscore.pluralize}_controller.rb"
-        file.puts "sed -i 's/.all/.where get_query_hash/'   app/controllers/#{model.underscore.pluralize}_controller.rb"
-        file.puts "sed -i 's/@#{model.underscore} = /# @#{model.underscore} = /'   app/controllers/#{model.underscore.pluralize}_controller.rb"
-        file.puts "sed -i 's/@#{model.underscore.pluralize} = /# @#{model.underscore.pluralize} = /'   app/controllers/#{model.underscore.pluralize}_controller.rb"
+        file.puts "#{$sed} -i 's/def index/load_and_authorize_resource\\n  def index/'   app/controllers/#{model.underscore.pluralize}_controller.rb"
+        file.puts "#{$sed} -i 's/.all/.where get_query_hash/'   app/controllers/#{model.underscore.pluralize}_controller.rb"
+        file.puts "#{$sed} -i 's/@#{model.underscore} = /# @#{model.underscore} = /'   app/controllers/#{model.underscore.pluralize}_controller.rb"
+        file.puts "#{$sed} -i 's/@#{model.underscore.pluralize} = /# @#{model.underscore.pluralize} = /'   app/controllers/#{model.underscore.pluralize}_controller.rb"
 
 
       rescue
@@ -260,10 +261,10 @@ def create_model_script options
           if v=='references'
             item = "#{model.underscore}.#{k}"
             if k=='user'
-              s="sed -i 's/#{item}/#{item}.email /'   app/views/#{model.underscore.pluralize}/index.html.erb"
+              s="#{$sed} -i 's/#{item}/#{item}.email /'   app/views/#{model.underscore.pluralize}/index.html.erb"
             elsif model[0] == model[0].upcase
               path = "\"\\\/#{k.underscore.pluralize}\\\/\#{#{model.underscore}.#{k}_id}\""
-              s="sed -i 's/#{item}/link_to #{item}_id, #{path} /'   app/views/#{model.underscore.pluralize}/index.html.erb"
+              s="#{$sed} -i 's/#{item}/link_to #{item}_id, #{path} /'   app/views/#{model.underscore.pluralize}/index.html.erb"
             end
             file.puts s
           end

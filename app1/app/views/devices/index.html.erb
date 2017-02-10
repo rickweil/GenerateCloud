@@ -21,7 +21,7 @@
   <tbody>
     <% @devices.each do |device| %>
       <tr>
-        <td><%= link_to device.business.name, "/businesses/#{device.business_id}"  %></td>
+        <td><%= link_to device.business_id, "/businesses/#{device.business_id}"  %></td>
         <td><%= device.serial_number %></td>
         <td><%= device.software_version %></td>
         <td><%= device.mac_address %></td>

@@ -39,22 +39,3 @@
 <br>
 
 <%= link_to 'New Result', new_result_path %>
-<script>
-
-    last_update = "<%= @results.first.updated_at %>";
-    (function pollServerForNewResults() {
-          $.ajax({
-              url: '/results/last_update.json',
-              data: {'last_update' : last_update},
-              success: function(response) {
-                 if(response.refresh)
-                   location.reload();
-                  setTimeout(pollServerForNewResults, 1000);
-              },
-              failure: function(response) {
-                  t=response.last_update;
-              }
-          });
-    }());
-
-</script>
