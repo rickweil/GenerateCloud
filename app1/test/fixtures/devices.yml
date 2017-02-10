@@ -8,7 +8,7 @@ one:
   latitude: 1.5
   longitude: 1.5
   license_key: MyString
-  license_expiration_date: 2017-01-18
+  license_expiration_date: 2017-02-09
   license_remaining_uses: 1
 
 two:
@@ -19,5 +19,5 @@ two:
   latitude: 1.5
   longitude: 1.5
   license_key: MyString
-  license_expiration_date: 2017-01-18
+  license_expiration_date: 2017-02-09
   license_remaining_uses: 1

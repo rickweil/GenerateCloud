@@ -65,3 +65,4 @@ gem 'cancancan'
 #import data from excel
 gem 'roo'
 gem 'iconv'
+

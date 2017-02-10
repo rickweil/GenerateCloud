@@ -4,5 +4,4 @@ class Result < ApplicationRecord
   belongs_to :business
   belongs_to :device
   belongs_to :consumable
-
 end
