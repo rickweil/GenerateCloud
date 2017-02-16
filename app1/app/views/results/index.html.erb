@@ -42,21 +42,47 @@
 <br>
 
 <script>
+/*
+    function getParameterByName(name, url) {
+        if (!url) {
+            url = window.location.href;
+        }
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+*/
+  <% if @update =='true' %>
+    // flash highlight the first table row if we are continuously updating.
+    $("#results-table tbody tr:first").css("background-color", "#ffffcc");
+    setTimeout(function() {
+        $("#results-table tbody tr:first").css("background-color", "white");
+    }, 2000);
 
-    last_update = "<%= @results.first.updated_at %>";
+    // poll server to see if new results have been recorded.  Reload page if so.
+    var xhr;
     (function pollServerForNewResults() {
-          $.ajax({
-              url: '/results/last_update.json',
-              data: {'last_update' : last_update},
-              success: function(response) {
-                 if(response.refresh)
-                   location.reload();
-                  setTimeout(pollServerForNewResults, 1000);
-              },
-              failure: function(response) {
-                  t=response.last_update;
-              }
-          });
+        if(xhr && xhr.readyState != 4){
+            xhr.abort();
+        }
+        xhr = $.ajax({
+            url: '/results/last_update.json',
+            success: function(response) {
+               if(response.refresh) {
+                   window.location = "/results?update=true";
+               }
+               hb = document.getElementById("hb");
+               hb.innerText = (hb.innerText.length == 0) ? "." : "";
+               setTimeout(pollServerForNewResults, 2000+Math.random());
+            },
+            error: function(response) {
+                alert("error");
+            }
+        });
     }());
+  <% end %>
 
 </script>
