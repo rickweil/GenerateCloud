@@ -1,28 +1,31 @@
+<h1>  <%= (@update =='true') ? "Newest Result" : "Result" %><span id="hb"></span> </h1>
+
 <p id="notice"><%= notice %></p>
 
+<div class = "hilite">
 <p>
   <strong>User:</strong>
-  <%= @result.user %>
+  <%= @result.user && (@result.user.first_name + " " + @result.user.last_name) %>
 </p>
 
 <p>
   <strong>Patient:</strong>
-  <%= @result.patient %>
+  <%= @result.patient && (@result.patient.first_name + " " + @result.patient.last_name) %>
 </p>
 
 <p>
   <strong>Business:</strong>
-  <%= @result.business %>
+  <%= @result.business && @result.business.name %>
 </p>
 
 <p>
   <strong>Device:</strong>
-  <%= @result.device %>
+  <%= @result.device && @result.device.serial_number %>
 </p>
 
 <p>
   <strong>Consumable:</strong>
-  <%= @result.consumable %>
+  <%= @result.consumable && "#{@result.consumable.udi} (exp #{@result.consumable.expiration_date})"%>
 </p>
 
 <p>
@@ -39,6 +42,35 @@
   <strong>Notes:</strong>
   <%= @result.notes %>
 </p>
-
+</div>
 <%= link_to 'Edit', edit_result_path(@result) %> |
 <%= link_to 'Back', results_path %>
+
+<% if @update =='true' %>
+    $(".hilite").css("background-color", "#ffffcc");
+    setTimeout(function() {
+        $(".hilite").css("background-color", "white").effect("highlight", {}, 2000);
+    }, 2000);
+
+    var xhr;
+    (function pollServerForNewResults() {
+        if(xhr && xhr.readyState != 4){
+            xhr.abort();
+        }
+        $.ajax({
+            url: '/results/last_update.json',
+            //data: {'last_update' : last_update},
+            success: function(response) {
+                if( response.update &&  response.refresh)
+                    window.location = '/results/' + response.newest + "?update=true";
+                hb = document.getElementById("hb");
+                hb.innerText = (hb.innerText.length == 0) ? "." : "";
+                setTimeout(pollServerForNewResults, 2000+Math.random());
+            },
+            failure: function(response) {
+                t=response.last_update;
+            }
+        });
+    }());
+<% end %>
+</script>

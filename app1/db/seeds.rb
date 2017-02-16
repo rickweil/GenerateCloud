@@ -75,7 +75,9 @@ rescue
 end
 
 sheets.each { |model|
+  if(model[0] != model[0].downcase)
     num = importx($file, model, $allowable)
     #print "#{num} records imported into #{model}\n"
+    end
 }
 

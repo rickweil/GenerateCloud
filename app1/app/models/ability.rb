@@ -2,6 +2,13 @@ class Ability
 # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
   include CanCan::Ability
   def initialize(user)
+
+    ############# @todo NO_AUTHORZATION
+    if !$AUTHENTICATOR
+      can [:manage], [:all]
+      return
+    end
+
     if user.super_admin_role? 
       can [:manage], [:all]
     end

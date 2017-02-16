@@ -4,13 +4,30 @@ class ResultsController < ApplicationController
   # GET /results
   # GET /results.json
   load_and_authorize_resource
+
   def index
     # @results = Result.where get_query_hash
+    @results = @results.order('updated_at DESC').where get_query_hash
+    session[:newest_browser_timestamp] = @results.first.updated_at.to_i
+    @update = session[:update] = params[:update].nil? ? 'false' : params[:update]
+    # flash[:notice] = "new results" if session[:update]    # flash a toast message on update
+  end
+
+  def last_update
+    @newest = @results.order('updated_at').last
+    @newest_server_timestamp = @newest.updated_at.to_i
+    refresh = @newest_server_timestamp != session[:newest_browser_timestamp]
+    respond_to do |format|
+        format.json { render json: { :refresh => refresh, :newest => @newest.id, :update => session[:update]} }
+      end
   end
 
   # GET /results/1
   # GET /results/1.json
   def show
+    session[:newest_browser_timestamp] = @result.updated_at.to_i
+    @update = session[:update] = params[:update]
+    # flash[:notice] = "new results" if session[:update]    # flash a toast message on update
   end
 
   # GET /results/new

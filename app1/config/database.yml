@@ -18,7 +18,7 @@ default: &default
   #TODO!!! YOU NEED TO CONFIGURE THIS for EACH environment for (development, test, production) 
   username: blog_role 
   password: blog_role 
-  host: "localhost" 
+  host: "localhost"
 
   adapter: postgresql
   encoding: unicode

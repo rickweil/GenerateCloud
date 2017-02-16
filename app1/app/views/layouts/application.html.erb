@@ -9,7 +9,7 @@
 </head>
 <body>
 <div style="overflow: hidden;">
-  <% if user_signed_in? %>
+  <% if !$AUTHENTICATOR || user_signed_in? %>
       <% @logo = Object.const_defined?("Business") ? Business.find(current_user.business_id).logo_url : "/images/sparton.jpg" %>
       <div style="float:left">
         <img src="<%= @logo %>" height="25"/>
@@ -19,16 +19,18 @@
             <% end %>
         <% end %>
 
-        <% if current_user.super_admin_role? %>
+        <% if $AUTHENTICATOR &&  current_user.super_admin_role? %>
             <%= link_to 'admin', rails_admin_path %>
         <% end %>
       </div>
       <div style="float:right">
 
-        <%= link_to(current_user.email, edit_user_registration_path) %> |
-        <%= link_to('Log out', destroy_user_session_path, :method => :delete) %>
-        <% if current_user.super_admin_role? %>
-            <br><%= "yea, you are a super admin"%>
+        <% if $AUTHENTICATOR %>
+            <%= link_to(current_user.email, edit_user_registration_path) %> |
+            <%= link_to('Log out', destroy_user_session_path, :method => :delete) %>
+            <% if current_user.super_admin_role? %>
+                <br><%= "yea, you are a super admin"%>
+            <% end %>
         <% end %>
       </div>
   <% else %>
@@ -50,3 +52,5 @@
 <%= yield %>
 </body>
 </html>
+
+

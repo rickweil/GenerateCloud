@@ -95,6 +95,7 @@ def create_app_script options
   file.puts "spring stop"    # ensure the spring server is stopped before running generator
   file.puts "rails g devise:install"
   file.puts "#{$sed} -i 's/config.action_mailer.raise_delivery_errors = false/config.action_mailer.raise_delivery_errors = true\\nconfig.action_mailer.default_url_options = { host: \"localhost\", port:3000 }\\n/' config/environments/development.rb"
+  file.puts "sed -i 's/config.action_mailer.raise_delivery_errors = false/config.action_mailer.raise_delivery_errors = true\\n  config.action_mailer.default_url_options = { host: \"localhost\", port:3000 }\\n/' config/environments/development.rb"
   file.puts "rails generate devise User"
   file.puts "rails generate devise:views"
 #
@@ -147,51 +148,61 @@ def post_process_script options
   file.puts "rake db:migrate"
 
 # augment Abililties
-  spreadsheet = Roo::Excelx.new(config_file)
-  spreadsheet.default_sheet = 'ability'
-  header = spreadsheet.row(1)
+  begin
+    spreadsheet = Roo::Excelx.new(config_file)
+    spreadsheet.default_sheet = 'ability'
+    header = spreadsheet.row(1)
 
-  file2 = File.open("#{app_name}/app/models/ability.rb",'w')
-  file2.puts "class Ability"
-  file2.puts "# https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities"
-  file2.puts "  include CanCan::Ability\n"
-  file2.puts "  def initialize(user)"
+    file2 = File.open("#{app_name}/app/models/ability.rb",'w')
+    file2.puts "class Ability"
+    file2.puts "# https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities"
+    file2.puts "  include CanCan::Ability\n"
+    file2.puts "  def initialize(user)\n\n"
+    file2.puts "  ############# @todo NO_AUTHORZATION"
+    file2.puts "    if !$AUTHENTICATOR"
+    file2.puts "      can [:manage], [:all]"
+    file2.puts "      return"
+    file2.puts "    end\n\n"
 
-  attr = attr.map { |str| str.to_s} if !attr.nil?
-  (2..spreadsheet.last_row).each do |i|
-    h = header.zip spreadsheet.row i
-    h = h.to_h
-    roles = h['Role'].split(',').map { |role| "user.#{role}? " }
-    abilities = h['Ability'].split(',').map { |ability| ability.strip.to_sym }
-    resources = h['Resource'].split(',').map { |resource| resource.strip }
-    conditions = []
-    conditions = h['Condition'].split(',').map { |condition| condition.strip } if h['Condition']
-    file2.puts "    if #{roles.join ' || '}"
+    attr = attr.map { |str| str.to_s} if !attr.nil?
+    (2..spreadsheet.last_row).each do |i|
+      h = header.zip spreadsheet.row i
+      h = h.to_h
+      roles = h['Role'].split(',').map { |role| "user.#{role}? " }
+      abilities = h['Ability'].split(',').map { |ability| ability.strip.to_sym }
+      resources = h['Resource'].split(',').map { |resource| resource.strip }
+      conditions = []
+      conditions = h['Condition'].split(',').map { |condition| condition.strip } if h['Condition']
+      file2.puts "    if #{roles.join ' || '}"
 
-    # create abilities
-    str = "      can #{abilities}, [#{resources.join ', '}]"
+      # create abilities
+      str = "      can #{abilities}, [#{resources.join ', '}]"
 
-    # add conditions if any
-    str += ', ' if conditions.length > 0
-    conditions.each_with_index { |condition, ii|
-      str += ', ' if ii > 0
-      if condition == 'user_id'
-        str += ":#{condition} => user.id"
-      elsif condition == "#{resources[0].underscore.downcase}_id"
-        str += ":id => user.#{condition}"
-      else
-        str += ":#{condition} => user.#{condition}"
-      end
-    }
-    file2.puts str
+      # add conditions if any
+      str += ', ' if conditions.length > 0
+      conditions.each_with_index { |condition, ii|
+        str += ', ' if ii > 0
+        if condition == 'user_id'
+          str += ":#{condition} => user.id"
+        elsif condition == "#{resources[0].underscore.downcase}_id"
+          str += ":id => user.#{condition}"
+        else
+          str += ":#{condition} => user.#{condition}"
+        end
+      }
+      file2.puts str
 
-    file2.puts "    end"
+      file2.puts "    end"
+    end
+    file2.puts "  end\nend\n"
+    file2.close
+    file.puts "cat #{app_name}/app/models/ability.rb"
+    file.close
+    File.chmod(0755, script_name)
+  rescue
+    puts "*********** ERROR CREATING ABILITY *************\n\n"
   end
-  file2.puts "  end\nend\n"
-  file2.close
-  file.puts "cat #{app_name}/app/models/ability.rb"
-  file.close
-  File.chmod(0755, script_name)
+
   script_name
 end
 
@@ -288,21 +299,19 @@ end
 # set up initial configuration parameters
 options = {
     # database configuration
-    adapter:  'postgresql', # or 'mysql' or 'sqlite3' or 'oracle_enhanced'
-    host:     'localhost',
-    database: 'development',
-    username: 'blog_role',
-    password: 'blog_role',
-    app_admin_name: 'rick.weil@sparton.com',
-    app_admin_password: '12341234',
+    # adapter:  'postgresql', # or 'mysql' or 'sqlite3' or 'oracle_enhanced'
+    # host:     'localhost',
+    # database: 'development',
+    # username: 'blog_role',
+    # password: 'blog_role',
 
-    # import stuff
-    model:  'all',            # work with all data models in the spreadsheet
-    file: nil,                # you have to specify this
-    import_data: true,        # import data for specified models
+    import_data: false,        # import data for specified models
     create_model: false,  # create and run migrations for specified models
     execute:  false,          # After creating a script, execute it.
 }
+
+options[:file] = ARGV.pop
+print options[:file]
 
 # parse command line optionsF
 OptionParser.new do |opts|
@@ -338,9 +347,23 @@ OptionParser.new do |opts|
     exit
   end
 end.parse!
-options[:file] = ARGV.pop if options[:file].nil?
+
 options[:app_name] = File.basename(options[:file], '.xlsx').downcase
 options[:database] = "#{options[:app_name]}_#{options[:database]}"
+
+begin
+  spreadsheet = Roo::Excelx.new(options[:file])
+  spreadsheet.default_sheet = 'config'
+  header = spreadsheet.row(1)
+  (2..spreadsheet.last_row).each do |i|
+    row = Hash[[header, spreadsheet.row(i)].transpose]
+    options[row['Key'].to_sym] = row['Value']
+  end
+rescue
+  raise "ya, you need spreadsheet with tab labeled 'config' Key and  Value columns and data for this to work\r\n"
+end
+options.each { |k,v| puts ":#{k} => '#{v}'" }
+
 
 print "OPTION:\t#{options}\r\n" if $verbose
 print "ARGV:\t#{ARGV}\r\n"      if $verbose
@@ -374,8 +397,8 @@ ActiveRecord::Base.establish_connection(
     adapter:  options[:adapter],
     host:     options[:host],
     database: options[:database],
-    username: options[:username],
-    password: options[:password]
+    username: options[:database_username],
+    password: options[:database_password]
 )
 
 if options[:create_model]

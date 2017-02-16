@@ -1,5 +1,10 @@
 class WelcomeController < ApplicationController
-  skip_before_action :authenticate_user!, :only => [:index]
+
+  ########### @todo NO_AUTHENTICATION
+  if $AUTHENTICATOR
+    skip_before_action :authenticate_user!, :only => [:index]
+  end
+
   def index
   end
 end
