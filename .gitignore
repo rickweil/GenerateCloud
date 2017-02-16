@@ -4,8 +4,17 @@
 skills/*
 skills_*.sh
 
+app1b/*
+app1b_*.sh
+app1b.xlsx
+
 app2/*
 app2_*.sh
+app2.xlsx
+
+app3/*
+app3_*.sh
+app3.xlsx
 
 app1_*.sh
 app1/*.rbc
