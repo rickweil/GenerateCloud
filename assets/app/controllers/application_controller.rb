@@ -9,6 +9,16 @@ class ApplicationController < ActionController::Base
     before_action :configure_permitted_parameters, if: :devise_controller?
   end
 
+  # for the fun of it, trap invalid foreign key relationships
+  around_action :rescue_from_fk_contraint
+  def rescue_from_fk_contraint
+    begin
+      yield
+    rescue ActiveRecord::InvalidForeignKey
+      redirect_to main_app.root_url, :alert => "Invalid foreign key, go back and try again."
+    end
+  end
+
 # set $models for application layout header to programatically set links to models
   Rails.application.eager_load!
   $models = ActiveRecord::Base.descendants
