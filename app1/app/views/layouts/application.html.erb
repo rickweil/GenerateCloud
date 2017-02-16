@@ -10,7 +10,7 @@
 <body>
 <div style="overflow: hidden;">
   <% if !$AUTHENTICATOR || user_signed_in? %>
-      <% @logo = Object.const_defined?("Business") ? Business.find(current_user.business_id).logo_url : "/images/sparton.jpg" %>
+      <% @logo = (Object.const_defined?("Business") && !current_user.nil?) ? Business.find(current_user.business_id).logo_url : "/images/sparton.jpg" %>
       <div style="float:left">
         <img src="<%= @logo %>" height="25"/>
         <% (3..$models.size()-1).each do |ii| model = $models[ii].to_s %>
